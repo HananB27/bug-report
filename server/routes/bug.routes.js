@@ -2,8 +2,7 @@ import express from "express";
 import {
   getAllBugs,
   createBug,
-  changeCompletedStatus,
-  getBugsByUserId,
+  changeCompletedStatus
 } from "../controllers/bug.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 
@@ -15,6 +14,5 @@ router.post("/", authMiddleware, createBug);
 
 router.put("/:id/completedStatus", authMiddleware, changeCompletedStatus);
 
-router.get("/:userId", authMiddleware, getBugsByUserId);
 
 export default router;

@@ -2,9 +2,20 @@ import Bug from "../models/Bug.model.js";
 import { ROLES } from "../constants.js";
 
 export const getAllBugs = async (req, res) => {
-  const bugs = await Bug.find();
-
-  res.status(200).send(bugs);
+  const { role, id } = req.user;
+  //assignedTo - developer
+  //reportedBy - qa
+  try {
+    let bugs = [];
+    if (role === ROLES.QA) {
+      bugs = await Bug.find({ reportedBy: id });
+    } else {
+      bugs = await Bug.find({ assignedTo: id });
+    }
+    res.status(200).send(bugs);
+  } catch (e) {
+    res.status(500).send("Error finding bug");
+  }
 };
 
 export const createBug = async (req, res) => {
@@ -34,20 +45,3 @@ export const changeCompletedStatus = async (req, res) => {
   }
 };
 
-export const getBugsByUserId = async (req, res) => {
-  const { userId } = req.params;
-  const { role } = req.user;
-  //assignedTo - developer
-  //reportedBy - qa
-  try {
-    let bugs = [];
-    if (role === ROLES.QA) {
-      bugs = await Bug.find({ reportedBy: userId });
-    } else {
-      bugs = await Bug.find({ assignedTo: userId });
-    }
-    res.status(200).send(bugs);
-  } catch (e) {
-    res.status(500).send("Error finding bug");
-  }
-};
