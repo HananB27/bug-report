@@ -1,20 +1,28 @@
-import { Card, CardContent, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import { useEffect, useState } from "react";
 import axiosInstance from "../axios-instance.js";
+import { useJwt } from "react-jwt";
 
 const BugDashboard = () => {
   const [bugs, setBugs] = useState([]);
+  const token = localStorage.getItem("token");
+  const { decodedToken: user } = useJwt(token);
 
   useEffect(() => {
-   (  async () => {
+    (async () => {
       const result = await axiosInstance.get("/bugs");
       if (result?.data?.length) {
         setBugs(result.data);
-        console.log(result);
       }
-    }) ();
+    })();
   }, []);
 
   return (
@@ -32,15 +40,20 @@ const BugDashboard = () => {
         <Typography sx={{ fontSize: "1.5rem" }}>Bug app</Typography>
         <BugReportOutlinedIcon sx={{ fontSize: "2rem", height: "auto" }} />
       </Box>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", padding: "20px" }}>
         {bugs?.map((bug) => (
-          <Card>
+          <Card sx={{ maxWidth: "250px" }} key={bug._id}>
             <CardContent>
               <Typography sx={{ fontWeight: "bold" }}>
                 Bug Title: {bug?.title}
               </Typography>
               <Typography>{bug?.steps}</Typography>
             </CardContent>
+            <CardActions>
+              {user.role === "developer" && (
+                <Button variant="outlined">Finish</Button>
+              )}
+            </CardActions>
           </Card>
         ))}
       </Box>
