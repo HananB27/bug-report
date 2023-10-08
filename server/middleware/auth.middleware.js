@@ -1,4 +1,4 @@
-import jwt  from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { SECRET } from "../constants.js";
 
 const verifyJwtToken = (req, res, next) => {
@@ -8,8 +8,15 @@ const verifyJwtToken = (req, res, next) => {
     const decoded = jwt.verify(token, SECRET);
     console.log(decoded);
     if (decoded) {
-        next();
-    } 
+      req.user = {
+        id: decoded.id,
+        role: decoded.role,
+        email: decoded.email,
+      };
+      next();
+    } else {
+      return res.status(401).send("Unauthorized!");
+    }
   } catch (e) {
     res.status(401).send("Unauthorized!");
   }
